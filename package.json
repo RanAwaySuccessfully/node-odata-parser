@@ -1,11 +1,11 @@
 {
-  "name": "odata-parser",
-  "version": "1.4.1",
+  "name": "span-node-odata-parser",
+  "version": "1.4.2",
   "description": "OData query string parser",
   "main": "lib/index.js",
   "scripts": {
-    "test": "rm -f lib/odata-parser.js && npm run-script prepublish && mocha -R spec",
-    "prepublish": "pegjs src/odata.pegjs lib/odata-parser.js"
+    "test": "rm -f lib/span-node-odata-parser.js && npm run-script prepublish && mocha -R spec",
+    "prepublish": "pegjs src/odata.pegjs lib/span-node-odata-parser.js"
   },
   "dependencies": {},
   "devDependencies": {
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/auth0/node-odata-parser"
+    "url": "https://github.com/spanops/node-odata-parser"
   },
   "keywords": [
     "odata",
