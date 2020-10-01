@@ -5,13 +5,13 @@ OData query string parser for node.js based on [pegjs](http://pegjs.majda.cz/).
 ## Installation
 
 ```
-npm install odata-parser
+npm install span-node-odata-parser
 ```
 
 ## Usage
 
 ```javascript
-var parser = require("odata-parser");
+var parser = require("span-node-odata-parser");
 
 var ast = parser.parse("$top=10&$skip=5&$select=foo")
 
