@@ -171,6 +171,96 @@ describe('odata.parser grammar', function () {
         assert.equal(ast.$filter.right.right.right.value, "Aro");
     });
 
+    describe('filter with square brackets', () => {
+        it('should parse $filter', function () {
+
+            var ast = parser.parse("$filter=[Name] eq 'Jef'");
+    
+            assert.equal(ast.$filter.type, "eq");
+            assert.equal(ast.$filter.left.type, "property");
+            assert.equal(ast.$filter.left.name, "[Name]");
+            assert.equal(ast.$filter.right.type, "literal");
+            assert.equal(ast.$filter.right.value, "Jef");
+        });
+        
+        it('should parse $filter containing quote', function () {
+        var ast = parser.parse("$filter=[Name] eq 'O''Neil'");
+    
+        assert.equal(ast.$filter.type, "eq");
+        assert.equal(ast.$filter.left.type, "property");
+        assert.equal(ast.$filter.left.name, "[Name]");
+        assert.equal(ast.$filter.right.type, "literal");
+        assert.equal(ast.$filter.right.value, "O'Neil");
+        });
+    
+        it('should parse $filter with subproperty', function () {
+        var ast = parser.parse("$filter=User/[Name] eq 'Jef'");
+        assert.equal(ast.$filter.type, "eq");
+        assert.equal(ast.$filter.left.type, "property");
+        assert.equal(ast.$filter.left.name, "User/[Name]");
+        assert.equal(ast.$filter.right.type, "literal");
+        assert.equal(ast.$filter.right.value, "Jef");
+        });
+        
+        it('should parse $filter containing quote', function () {
+    
+          var ast = parser.parse("$filter=[Name] eq 'O''Neil'");
+    
+          assert.equal(ast.$filter.type, "eq");
+          assert.equal(ast.$filter.left.type, "property");
+          assert.equal(ast.$filter.left.name, "[Name]");
+          assert.equal(ast.$filter.right.type, "literal");
+          assert.equal(ast.$filter.right.value, "O'Neil");
+      });
+    
+        it('should parse $filter with subproperty', function () {
+        var ast = parser.parse("$filter=User/[Name] eq 'Jef'");
+        assert.equal(ast.$filter.type, "eq");
+        assert.equal(ast.$filter.left.type, "property");
+        assert.equal(ast.$filter.left.name, "User/[Name]");
+        assert.equal(ast.$filter.right.type, "literal");
+        assert.equal(ast.$filter.right.value, "Jef");
+        });
+        
+        it('should parse multiple conditions in a $filter', function () {
+    
+            var ast = parser.parse("$filter=[Name] eq 'John' and LastName lt 'Doe'");
+    
+            assert.equal(ast.$filter.type, "and");
+            assert.equal(ast.$filter.left.type, "eq");
+            assert.equal(ast.$filter.left.left.type, "property");
+            assert.equal(ast.$filter.left.left.name, "[Name]");
+            assert.equal(ast.$filter.left.right.type, "literal");
+            assert.equal(ast.$filter.left.right.value, "John");
+            assert.equal(ast.$filter.right.type, "lt");
+            assert.equal(ast.$filter.right.left.type, "property");
+            assert.equal(ast.$filter.right.left.name, "LastName");
+            assert.equal(ast.$filter.right.right.type, "literal");
+            assert.equal(ast.$filter.right.right.value, "Doe");
+        });
+    
+        it('should parse multiple complex conditions in a $filter', function () {
+    
+            var ast = parser.parse("$filter=[Name] eq 'John' and (LastName lt 'Doe' or LastName gt 'Aro')");
+    
+            assert.equal(ast.$filter.type, "and");
+            assert.equal(ast.$filter.left.type, "eq");
+            assert.equal(ast.$filter.left.left.type, "property");
+            assert.equal(ast.$filter.left.left.name, "[Name]");
+            assert.equal(ast.$filter.left.right.type, "literal");
+            assert.equal(ast.$filter.left.right.value, "John");
+            assert.equal(ast.$filter.right.type, "or");
+            assert.equal(ast.$filter.right.left.type, "lt");
+            assert.equal(ast.$filter.right.left.left.name, "LastName");
+            assert.equal(ast.$filter.right.left.right.type, "literal");
+            assert.equal(ast.$filter.right.left.right.value, "Doe");
+            assert.equal(ast.$filter.right.right.type, "gt");
+            assert.equal(ast.$filter.right.right.left.name, "LastName");
+            assert.equal(ast.$filter.right.right.right.type, "literal");
+            assert.equal(ast.$filter.right.right.right.value, "Aro");
+        });
+    })
+
     it('should parse substringof $filter', function () {
 
         var ast = parser.parse("$filter=substringof('nginx', Data)");
