@@ -1,16 +1,15 @@
 {
   "name": "span-node-odata-parser",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "OData query string parser",
   "main": "lib/index.js",
   "scripts": {
-    "test": "rm -f lib/span-node-odata-parser.js && npm run-script prepublish && mocha -R spec",
+    "test": "node ./node_modules/jasmine/bin/jasmine.js",
     "prepublish": "pegjs src/odata.pegjs lib/span-node-odata-parser.js"
   },
-  "dependencies": {},
   "devDependencies": {
-    "pegjs": "0.7.0",
-    "mocha": "2.1.0"
+    "jasmine": "^4.2.1",
+    "pegjs": "0.7.0"
   },
   "repository": {
     "type": "git",
