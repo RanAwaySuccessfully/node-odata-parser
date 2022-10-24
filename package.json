@@ -1,10 +1,10 @@
 {
   "name": "@softools/odata-parser",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "OData query string parser",
   "main": "lib/index.js",
   "scripts": {
-    "test": "rm -f lib/odata-parser.js && npm run-script prepublish && mocha -R spec",
+    "test": " npm run-script prepublish && mocha -R spec",
     "prepublish": "pegjs src/odata.pegjs lib/odata-parser.js"
   },
   "dependencies": {},
