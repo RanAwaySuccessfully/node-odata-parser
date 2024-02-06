@@ -176,6 +176,13 @@ unreserved                  = a:[a-zA-Z0-9-_]+ { return a.join(''); }
 validstring                 = a:([^']/escapedQuote)* { return a.join('').replace(/('')/g, "'"); }
 escapedQuote                = a:"''" { return a; }
 identifierPart              = a:[_a-zA-Z] b:unreserved? { return a + b; }
+arrayValue                  = a:string / a:decimal / a:double / a:guid
+array                       = "(" a:arrayValue b:(',' arrayValue)* ")" {
+                                return {
+                                    type: 'array',
+                                    value: [a].concat(b.map(f => f[1]))
+                                }
+                              }
 identifier                  =
                                 a:identifierPart list:("." i:identifier {return i;})? {
                                     if (list === "") list = [];
@@ -349,6 +356,7 @@ cond                        = a:part WSP op:op WSP b:part {
 part                        =   booleanFunc /
                                 otherFunc2 /
                                 otherFunc1 /
+                                array /
                                 l:primitiveLiteral {
                                     return {
                                         type: 'literal',
@@ -372,7 +380,8 @@ op                          =
                                 "sub" /
                                 "mul" /
                                 "div" /
-                                "mod"
+                                "mod" /
+                                "in"
 
 unsupported                 =   "$" er:.* { return { error: "unsupported method: " + er }; }
 

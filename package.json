@@ -1,25 +1,28 @@
 {
-  "name": "odata-parser",
-  "version": "1.4.1",
+  "name": "@seamapi/odata-parser",
+  "version": "1.0.2",
   "description": "OData query string parser",
   "main": "lib/index.js",
   "scripts": {
-    "test": "rm -f lib/odata-parser.js && npm run-script prepublish && mocha -R spec",
-    "prepublish": "pegjs src/odata.pegjs lib/odata-parser.js"
+    "test": "npm run clean && npm run build && mocha -R spec",
+    "clean": "rm -rf lib/odata-parser.js",
+    "build": "pegjs src/odata.pegjs lib/odata-parser.js"
   },
   "dependencies": {},
   "devDependencies": {
-    "pegjs": "0.7.0",
-    "mocha": "2.1.0"
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^9.0.0",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "mocha": "2.1.0",
+    "pegjs": "0.7.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/auth0/node-odata-parser"
-  },
+  "repository": "git@github.com:seamapi/node-odata-parser.git",
   "keywords": [
     "odata",
     "parser"
   ],
+  "types": "types/index.d.ts",
   "author": "auth0",
   "license": "MIT"
 }

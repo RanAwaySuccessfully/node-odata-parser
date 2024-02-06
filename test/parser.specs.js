@@ -423,6 +423,13 @@ describe('odata.parser grammar', function () {
         assert.equal(ast.$filter.left.name, "_first_name");
     });
 
+    it('should accept in', function () {
+        var ast = parser.parse("$filter=_first_name in ('id-1','id-2','id-3')");
+        assert.equal(ast.$filter.left.name, "_first_name");
+        assert.deepEqual(ast.$filter.right.value, ['id-1','id-2','id-3']);
+        assert.equal(ast.$filter.right.type, 'array');
+    });
+
     // it('xxxxx', function () {
     //     var ast = parser.parse("$top=2&$filter=Date gt datetime'2012-09-27T21:12:59'");
 
