@@ -79,7 +79,8 @@ byte                        =   DIGIT DIGIT DIGIT
 
 dateTime                    =   "datetime" SQUOTE a:dateTimeBody SQUOTE { return new Date(a); }
 
-dateTimeOffset              =   "datetimeoffset" SQUOTE a:dateTimeOffsetBody SQUOTE { return new Date(a); }
+dateTimeOffset              =   "datetimeoffset" SQUOTE a:dateTimeOffsetBody SQUOTE { return new Date(a); } /
+                                a:dateTimeOffsetBody { return new Date(a); }
 
 dateTimeBodyA               =  a:year "-" b:month "-" c:day "T" d:hour ":" e:minute {
                                     return a + '-' + b + '-' + c + "T" + d + ":" + e;
