@@ -207,7 +207,7 @@ callback                    =   "$callback=" a:identifier { return { '$callback'
 count                       =   "$count" { return {'$count': true}; }
                             /   "$count=true" { return {'$count': true}; }
 
-search                      =   "$search=" searchterm:.+ { return {'$search': searchterm.join('') }; }
+search                      =   "$search=" searchterm:part { return {'$search': searchterm }; }
 
 // $top
 top                         =   "$top=" a:INT { return { '$top': ~~a }; }
