@@ -520,9 +520,56 @@ describe('odata.parser grammar', function () {
         assert.equal(ast.$filter.right.type, 'array');
     });
 
+    it('should negate with not ', function () {
+        var ast = parser.parse("$filter=not(baz eq 2)");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "eq");
+        assert.equal(ast.$filter.value.left.type, "property");
+        assert.equal(ast.$filter.value.left.name, "baz");
+        assert.equal(ast.$filter.value.right.type, "literal");
+        assert.equal(ast.$filter.value.right.value, 2);
+    });
+
+    it('should negate with not and not be fussy about whitespace', function () {
+        var ast = parser.parse("$filter=not (baz eq 2)");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "eq");
+        assert.equal(ast.$filter.value.left.type, "property");
+        assert.equal(ast.$filter.value.left.name, "baz");
+        assert.equal(ast.$filter.value.right.type, "literal");
+        assert.equal(ast.$filter.value.right.value, 2);
+    });
+
+
+    it('should negate substrings with not ', function () {
+        var ast = parser.parse("$filter=not(substringof('Fred', Baz) or substringof('Barney', Baz))");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "or");
+        assert.equal(ast.$filter.value.left.type, "functioncall");
+        assert.equal(ast.$filter.value.left.func, "substringof");
+        assert.equal(ast.$filter.value.left.args[0].value, "Fred");
+        assert.equal(ast.$filter.value.left.args[1].name, "Baz");
+        assert.equal(ast.$filter.value.right.type, "functioncall");
+        assert.equal(ast.$filter.value.right.func, "substringof");
+        assert.equal(ast.$filter.value.right.args[0].value, "Barney");
+        assert.equal(ast.$filter.value.right.args[1].name, "Baz");
+    });
+
+    it('should nest nots', function () {
+        var ast = parser.parse("$filter=not(not(a eq 1))");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "not");
+    });
+
+    // This fails - grammar needs more work!
+    xit('should negate boolean constant', function () {
+        var ast = parser.parse("$filter=not(true)");
+        // console.log(JSON.stringify(ast, 0, 2));
+    });
+
+
     // it('xxxxx', function () {
     //     var ast = parser.parse("$top=2&$filter=Date gt datetime'2012-09-27T21:12:59'");
-
     //     console.log(JSON.stringify(ast, 0, 2));
     // });
 });

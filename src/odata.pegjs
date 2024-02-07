@@ -287,6 +287,7 @@ filter                      =   "$filter=" list:filterExpr {
                             /   "$filter=" .* { return {"error": 'invalid $filter parameter'}; }
 
 filterExpr                  = 
+                            notFunc /
                               left:("(" WSP? filter:filterExpr WSP? ")"{return filter}) right:( WSP type:("and"/"or") WSP value:filterExpr{
                                     return { type: type, value: value}
                               })? {
@@ -299,6 +300,10 @@ filterExpr                  =
                               }
 
 booleanFunctions2Args       = "substringof" / "endswith" / "startswith" / "IsOf"
+
+notFunc = "not" WSP? "(" arg0:filterExpr ")" {
+    return { type: "not", value: arg0 };
+}
 
 booleanFunc                 =  f:booleanFunctions2Args "(" arg0:part "," WSP? arg1:part ")" {
                                     return {
@@ -313,7 +318,8 @@ booleanFunc                 =  f:booleanFunctions2Args "(" arg0:part "," WSP? ar
                                         func: "IsOf",
                                         args: [arg0]
                                     }
-                                }
+                                } /
+                                notFunc
 
 otherFunctions1Arg          = "tolower" / "toupper" / "trim" / "length" / "year" /
                               "month" / "day" / "hour" / "minute" / "second" /
