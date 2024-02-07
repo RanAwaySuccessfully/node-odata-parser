@@ -173,10 +173,10 @@ nanInfinity                 =   nan / negativeInfinity / positiveInfinity
  * OData identifiers
  */
 
-unreserved                  = a:[a-zA-Z0-9-_]+ { return a.join(''); }
+unreserved                  = a:[a-zA-Z0-9-_\]]+ { return a.join(''); }
 validstring                 = a:([^']/escapedQuote)* { return a.join('').replace(/('')/g, "'"); }
 escapedQuote                = a:"''" { return a; }
-identifierPart              = a:[_a-zA-Z] b:unreserved? { return a + b; }
+identifierPart              = a:[_a-zA-Z\[] b:unreserved? { return a + b; }
 arrayValue                  = a:string / a:decimal / a:double / a:guid
 array                       = "(" a:arrayValue b:(',' arrayValue)* ")" {
                                 return {
@@ -187,7 +187,7 @@ array                       = "(" a:arrayValue b:(',' arrayValue)* ")" {
 identifier                  =
                                 a:identifierPart list:("." i:identifier {return i;})? {
                                     if (list === "") list = [];
-                                    if (require('util').isArray(list[0])) {
+                                    if (Array.isArray(list[0])) {
                                         list = list[0];
                                     }
                                     list.unshift(a);
@@ -219,7 +219,7 @@ expand                      =   "$expand=" list:expandList { return { "$expand":
 
 expandList                  =   i:identifierPath list:("," WSP? l:expandList {return l;})? {
                                     if (list === "") list = [];
-                                    if (require('util').isArray(list[0])) {
+                                    if (Array.isArray(list[0])) {
                                         list = list[0];
                                     }
                                     list.unshift(i);
@@ -250,7 +250,7 @@ orderbyList                 = i:(id:identifier ord:(WSP ("asc"/"desc"))? {
                               list:("," WSP? l:orderbyList{return l;})? {
 
                                     if (list === "") list = [];
-                                    if (require('util').isArray(list[0])) {
+                                    if (Array.isArray(list[0])) {
                                         list = list[0];
                                     }
                                     list.unshift(i);
@@ -262,7 +262,7 @@ select                      =   "$select=" list:selectList { return { "$select":
                             /   "$select=" .* { return {"error": 'invalid $select parameter'}; }
 
 identifierPathParts         =   "/" i:identifierPart list:identifierPathParts? {
-                                    if (require('util').isArray(list[0])) {
+                                    if (Array.isArray(list[0])) {
                                         list = list[0];
                                     }
                                     return "/" + i + list;
@@ -271,7 +271,7 @@ identifierPath              =   a:identifier b:identifierPathParts? { return a +
 selectList                  =
                                 i:(a:identifierPath b:".*"?{return a + b;}/"*") list:("," WSP? l:selectList {return l;})? {
                                     if (list === "") list = [];
-                                    if (require('util').isArray(list[0])) {
+                                    if (Array.isArray(list[0])) {
                                         list = list[0];
                                     }
                                     list.unshift(i);
@@ -287,6 +287,7 @@ filter                      =   "$filter=" list:filterExpr {
                             /   "$filter=" .* { return {"error": 'invalid $filter parameter'}; }
 
 filterExpr                  = 
+                            notFunc /
                               left:("(" WSP? filter:filterExpr WSP? ")"{return filter}) right:( WSP type:("and"/"or") WSP value:filterExpr{
                                     return { type: type, value: value}
                               })? {
@@ -299,6 +300,10 @@ filterExpr                  =
                               }
 
 booleanFunctions2Args       = "substringof" / "endswith" / "startswith" / "IsOf"
+
+notFunc = "not" WSP? "(" arg0:filterExpr ")" {
+    return { type: "not", value: arg0 };
+}
 
 booleanFunc                 =  f:booleanFunctions2Args "(" arg0:part "," WSP? arg1:part ")" {
                                     return {
@@ -313,7 +318,8 @@ booleanFunc                 =  f:booleanFunctions2Args "(" arg0:part "," WSP? ar
                                         func: "IsOf",
                                         args: [arg0]
                                     }
-                                }
+                                } /
+                                notFunc
 
 otherFunctions1Arg          = "tolower" / "toupper" / "trim" / "length" / "year" /
                               "month" / "day" / "hour" / "minute" / "second" /

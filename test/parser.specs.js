@@ -171,6 +171,96 @@ describe('odata.parser grammar', function () {
         assert.equal(ast.$filter.right.right.right.value, "Aro");
     });
 
+    describe('filter with square brackets', () => {
+        it('should parse $filter', function () {
+
+            var ast = parser.parse("$filter=[Name] eq 'Jef'");
+    
+            assert.equal(ast.$filter.type, "eq");
+            assert.equal(ast.$filter.left.type, "property");
+            assert.equal(ast.$filter.left.name, "[Name]");
+            assert.equal(ast.$filter.right.type, "literal");
+            assert.equal(ast.$filter.right.value, "Jef");
+        });
+        
+        it('should parse $filter containing quote', function () {
+        var ast = parser.parse("$filter=[Name] eq 'O''Neil'");
+    
+        assert.equal(ast.$filter.type, "eq");
+        assert.equal(ast.$filter.left.type, "property");
+        assert.equal(ast.$filter.left.name, "[Name]");
+        assert.equal(ast.$filter.right.type, "literal");
+        assert.equal(ast.$filter.right.value, "O'Neil");
+        });
+    
+        it('should parse $filter with subproperty', function () {
+        var ast = parser.parse("$filter=User/[Name] eq 'Jef'");
+        assert.equal(ast.$filter.type, "eq");
+        assert.equal(ast.$filter.left.type, "property");
+        assert.equal(ast.$filter.left.name, "User/[Name]");
+        assert.equal(ast.$filter.right.type, "literal");
+        assert.equal(ast.$filter.right.value, "Jef");
+        });
+        
+        it('should parse $filter containing quote', function () {
+    
+          var ast = parser.parse("$filter=[Name] eq 'O''Neil'");
+    
+          assert.equal(ast.$filter.type, "eq");
+          assert.equal(ast.$filter.left.type, "property");
+          assert.equal(ast.$filter.left.name, "[Name]");
+          assert.equal(ast.$filter.right.type, "literal");
+          assert.equal(ast.$filter.right.value, "O'Neil");
+      });
+    
+        it('should parse $filter with subproperty', function () {
+        var ast = parser.parse("$filter=User/[Name] eq 'Jef'");
+        assert.equal(ast.$filter.type, "eq");
+        assert.equal(ast.$filter.left.type, "property");
+        assert.equal(ast.$filter.left.name, "User/[Name]");
+        assert.equal(ast.$filter.right.type, "literal");
+        assert.equal(ast.$filter.right.value, "Jef");
+        });
+        
+        it('should parse multiple conditions in a $filter', function () {
+    
+            var ast = parser.parse("$filter=[Name] eq 'John' and LastName lt 'Doe'");
+    
+            assert.equal(ast.$filter.type, "and");
+            assert.equal(ast.$filter.left.type, "eq");
+            assert.equal(ast.$filter.left.left.type, "property");
+            assert.equal(ast.$filter.left.left.name, "[Name]");
+            assert.equal(ast.$filter.left.right.type, "literal");
+            assert.equal(ast.$filter.left.right.value, "John");
+            assert.equal(ast.$filter.right.type, "lt");
+            assert.equal(ast.$filter.right.left.type, "property");
+            assert.equal(ast.$filter.right.left.name, "LastName");
+            assert.equal(ast.$filter.right.right.type, "literal");
+            assert.equal(ast.$filter.right.right.value, "Doe");
+        });
+    
+        it('should parse multiple complex conditions in a $filter', function () {
+    
+            var ast = parser.parse("$filter=[Name] eq 'John' and (LastName lt 'Doe' or LastName gt 'Aro')");
+    
+            assert.equal(ast.$filter.type, "and");
+            assert.equal(ast.$filter.left.type, "eq");
+            assert.equal(ast.$filter.left.left.type, "property");
+            assert.equal(ast.$filter.left.left.name, "[Name]");
+            assert.equal(ast.$filter.left.right.type, "literal");
+            assert.equal(ast.$filter.left.right.value, "John");
+            assert.equal(ast.$filter.right.type, "or");
+            assert.equal(ast.$filter.right.left.type, "lt");
+            assert.equal(ast.$filter.right.left.left.name, "LastName");
+            assert.equal(ast.$filter.right.left.right.type, "literal");
+            assert.equal(ast.$filter.right.left.right.value, "Doe");
+            assert.equal(ast.$filter.right.right.type, "gt");
+            assert.equal(ast.$filter.right.right.left.name, "LastName");
+            assert.equal(ast.$filter.right.right.right.type, "literal");
+            assert.equal(ast.$filter.right.right.right.value, "Aro");
+        });
+    })
+
     it('should parse substringof $filter', function () {
 
         var ast = parser.parse("$filter=substringof('nginx', Data)");
@@ -430,9 +520,56 @@ describe('odata.parser grammar', function () {
         assert.equal(ast.$filter.right.type, 'array');
     });
 
+    it('should negate with not ', function () {
+        var ast = parser.parse("$filter=not(baz eq 2)");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "eq");
+        assert.equal(ast.$filter.value.left.type, "property");
+        assert.equal(ast.$filter.value.left.name, "baz");
+        assert.equal(ast.$filter.value.right.type, "literal");
+        assert.equal(ast.$filter.value.right.value, 2);
+    });
+
+    it('should negate with not and not be fussy about whitespace', function () {
+        var ast = parser.parse("$filter=not (baz eq 2)");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "eq");
+        assert.equal(ast.$filter.value.left.type, "property");
+        assert.equal(ast.$filter.value.left.name, "baz");
+        assert.equal(ast.$filter.value.right.type, "literal");
+        assert.equal(ast.$filter.value.right.value, 2);
+    });
+
+
+    it('should negate substrings with not ', function () {
+        var ast = parser.parse("$filter=not(substringof('Fred', Baz) or substringof('Barney', Baz))");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "or");
+        assert.equal(ast.$filter.value.left.type, "functioncall");
+        assert.equal(ast.$filter.value.left.func, "substringof");
+        assert.equal(ast.$filter.value.left.args[0].value, "Fred");
+        assert.equal(ast.$filter.value.left.args[1].name, "Baz");
+        assert.equal(ast.$filter.value.right.type, "functioncall");
+        assert.equal(ast.$filter.value.right.func, "substringof");
+        assert.equal(ast.$filter.value.right.args[0].value, "Barney");
+        assert.equal(ast.$filter.value.right.args[1].name, "Baz");
+    });
+
+    it('should nest nots', function () {
+        var ast = parser.parse("$filter=not(not(a eq 1))");
+        assert.equal(ast.$filter.type, "not");
+        assert.equal(ast.$filter.value.type, "not");
+    });
+
+    // This fails - grammar needs more work!
+    xit('should negate boolean constant', function () {
+        var ast = parser.parse("$filter=not(true)");
+        // console.log(JSON.stringify(ast, 0, 2));
+    });
+
+
     // it('xxxxx', function () {
     //     var ast = parser.parse("$top=2&$filter=Date gt datetime'2012-09-27T21:12:59'");
-
     //     console.log(JSON.stringify(ast, 0, 2));
     // });
 });
