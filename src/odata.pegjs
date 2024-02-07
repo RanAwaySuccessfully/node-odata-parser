@@ -173,10 +173,10 @@ nanInfinity                 =   nan / negativeInfinity / positiveInfinity
  * OData identifiers
  */
 
-unreserved                  = a:[a-zA-Z0-9-_]+ { return a.join(''); }
+unreserved                  = a:[a-zA-Z0-9-_\]]+ { return a.join(''); }
 validstring                 = a:([^']/escapedQuote)* { return a.join('').replace(/('')/g, "'"); }
 escapedQuote                = a:"''" { return a; }
-identifierPart              = a:[_a-zA-Z] b:unreserved? { return a + b; }
+identifierPart              = a:[_a-zA-Z\[] b:unreserved? { return a + b; }
 arrayValue                  = a:string / a:decimal / a:double / a:guid
 array                       = "(" a:arrayValue b:(',' arrayValue)* ")" {
                                 return {
