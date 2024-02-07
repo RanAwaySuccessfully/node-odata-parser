@@ -8,7 +8,6 @@
     "clean": "rm -rf lib/odata-parser.js",
     "build": "pegjs src/odata.pegjs lib/odata-parser.js"
   },
-  "dependencies": {},
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",
