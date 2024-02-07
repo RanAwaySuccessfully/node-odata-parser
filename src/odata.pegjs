@@ -204,6 +204,11 @@ identifier                  =
 // callback
 callback                    =   "$callback=" a:identifier { return { '$callback': a }; }
 
+count                       =   "$count" { return {'$count': true}; }
+                            /   "$count=true" { return {'$count': true}; }
+
+search                      =   "$search=" searchterm:.+ { return {'$search': searchterm.join('') }; }
+
 // $top
 top                         =   "$top=" a:INT { return { '$top': ~~a }; }
                             /   "$top=" .* { return {"error": 'invalid $top parameter'}; }
@@ -397,6 +402,8 @@ expList                     = e:exp "&" el:expList { return [e].concat(el); } /
 
 
 exp                         =
+                                count /
+                                search /
                                 expand /
                                 filter /
                                 orderby /
