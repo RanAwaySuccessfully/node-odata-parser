@@ -5,7 +5,7 @@ Fork with added support for the `IN` filter.
 ## Installation
 
 ```
-npm install @seamapi/odata-parser
+npm install git+https://github.com/RanAwaySuccessfully/node-odata-parser
 ```
 
 ## Usage
@@ -92,9 +92,7 @@ restuls in:
 
 ## Author
 
-[Auth0](auth0.com)
-
-Forked by Seam
+[Auth0](auth0.com) with additional contributors
 
 ## License
 
